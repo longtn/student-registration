@@ -1,4 +1,5 @@
-﻿@model IEnumerable<StudentRegistration.Core.Entities.Student>
+﻿@using StudentRegistration.App.Extensions;
+@model IEnumerable<StudentRegistration.Core.Entities.Student>
 
 @{
     ViewBag.Title = "Index";
@@ -6,9 +7,7 @@
 
 <h2>Students</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+<input type="button" value="Create New" class="btn btn-primary" onclick="location.href='@Url.Action("Create", "Student")'" />
 
 <table class="table">
     <tr>
@@ -21,30 +20,30 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Id)
-        </td>
-        <td>
-            @Html.ActionLink(item.NRIC, "Edit", new { id = item.Id })
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Gender)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Birthday)
-        </td>
-        <td>
-            TODO:
-        </td>
-        <td>
-            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-        </td>
-    </tr>
-}
-
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.ActionLink(item.NRIC, "Edit", new { id = item.Id })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender)
+            </td>
+            <td>
+                @item.Birthday.GetAge().ToString()
+            </td>
+            <td>
+                @(item.Subjects?.ToList().Count() ?? 0)
+            </td>
+            <td>
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
 </table>

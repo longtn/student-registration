@@ -1,5 +1,6 @@
 ﻿using StudentRegistration.Core.Data;
 using StudentRegistration.Core.Entities;
+using System;
 using System.Data.Entity;
 using System.Net;
 using System.Threading.Tasks;
@@ -32,6 +33,8 @@ namespace StudentRegistration.App.Controllers
         {
             if (ModelState.IsValid)
             {
+                student.CreatedDate = DateTime.Now;
+                student.UpdatedDate = DateTime.Now;
                 db.Students.Add(student);
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");

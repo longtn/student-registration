@@ -14,7 +14,7 @@ namespace StudentRegistration.Core.Migrations
 
         protected override void Seed(StudentRegistration.Core.Data.StudentRegistrationContext context)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
 
             context.Students.AddOrUpdate(i => i.Id,
                 new Student() { Id = 1, CreatedDate = now, UpdatedDate = now, NRIC = "S1234567A", Name = "Tom", Gender = "M", Birthday = DateTime.Parse("Jul 24, 2003") },
