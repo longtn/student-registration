@@ -1,112 +1,122 @@
-﻿using StudentRegistration.Core.Data;
+﻿using AutoMapper;
+using StudentRegistration.App.DTOs;
 using StudentRegistration.Core.Entities;
+using StudentRegistration.Core.Services.Abstractions;
 using System;
-using System.Data.Entity;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace StudentRegistration.App.Controllers
 {
     public class StudentController : Controller
     {
-        private StudentRegistrationContext db = new StudentRegistrationContext();
+        private readonly IStudentService _studentService;
+        private readonly ISubjectService _subjectService;
+        private readonly IMapper _mapper;
 
-        // GET: Student
-        public async Task<ActionResult> Index()
+        public StudentController(
+            IStudentService studentService,
+            ISubjectService subjectService,
+            IMapper mapper
+            )
         {
-            return View(await db.Students.ToListAsync());
+            _studentService = studentService;
+            _subjectService = subjectService;
+            _mapper = mapper;
         }
 
-        // GET: Student/Create
+        public ActionResult Index()
+        {
+            var students = _studentService.GetStudents();
+            var result = _mapper.Map<List<StudentDTO>>(students);
+
+            return View(result);
+        }
+
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Student/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,NRIC,Name,Gender,Birthday,AvailableDate,CreatedDate,UpdatedDate")] Student student)
+        public ActionResult Create([Bind(Include = "Id,NRIC,Name,Gender,Birthday,AvailableDate,CreatedDate,UpdatedDate")] StudentDTO student)
         {
             if (ModelState.IsValid)
             {
-                student.CreatedDate = DateTime.Now;
-                student.UpdatedDate = DateTime.Now;
-                db.Students.Add(student);
-                await db.SaveChangesAsync();
+                //student.CreatedDate = DateTime.Now;
+                //student.UpdatedDate = DateTime.Now;
+                //db.Students.Add(student);
+                //await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
 
             return View(student);
         }
 
-        // GET: Student/Edit/5
-        public async Task<ActionResult> Edit(int? id)
+        public ActionResult Edit(int id)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Student student = await db.Students.FindAsync(id);
+            var student = _studentService.GetStudent(id);
             if (student == null)
             {
                 return HttpNotFound();
             }
-            return View(student);
+
+            var subjects = _subjectService.GetSubjects();
+            var result = _mapper.Map<StudentDTO>(student);
+
+            ViewBag.Subjects = subjects.Select(i => new SelectListItem
+            {
+                Text = i.Name,
+                Value = i.Id.ToString()
+            });
+
+            return View(result);
         }
 
-        // POST: Student/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,NRIC,Name,Gender,Birthday,AvailableDate,CreatedDate,UpdatedDate")] Student student)
+        public ActionResult Edit([Bind(Include = "Id,NRIC,Name,Gender,Birthday,AvailableDate,CreatedDate,SelectedSubjects")] StudentDTO student)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(student).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                var data = _mapper.Map<Student>(student);
+                var subjects = _subjectService.GetSubjects();
+                
+                data.UpdatedDate = DateTime.Now;
+                data.Subjects = (IEnumerable<StudentSubject>)subjects.Where(i => student.SelectedSubjects.Contains(i.Id)).ToList();
+
+                //_studentService.UpdateStudent(data);
                 return RedirectToAction("Index");
             }
             return View(student);
         }
 
-        // GET: Student/Delete/5
-        public async Task<ActionResult> Delete(int? id)
+        public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Student student = await db.Students.FindAsync(id);
-            if (student == null)
-            {
-                return HttpNotFound();
-            }
-            return View(student);
+
+            //Student student = await db.Students.FindAsync(id);
+            //if (student == null)
+            //{
+            //    return HttpNotFound();
+            //}
+            return View();
         }
 
-        // POST: Student/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(int id)
         {
-            Student student = await db.Students.FindAsync(id);
-            db.Students.Remove(student);
-            await db.SaveChangesAsync();
+            //Student student = await db.Students.FindAsync(id);
+            //db.Students.Remove(student);
+            //await db.SaveChangesAsync();
             return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
     }
 }

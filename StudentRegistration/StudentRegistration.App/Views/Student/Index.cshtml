@@ -1,5 +1,4 @@
-﻿@using StudentRegistration.App.Extensions;
-@model IEnumerable<StudentRegistration.Core.Entities.Student>
+﻿@model IEnumerable<StudentRegistration.App.DTOs.StudentDTO>
 
 @{
     ViewBag.Title = "Index";
@@ -36,13 +35,13 @@
                 @Html.DisplayFor(modelItem => item.Gender)
             </td>
             <td>
-                @item.Birthday.GetAge().ToString()
+                @Html.DisplayFor(modelItem => item.Age)
             </td>
             <td>
-                @(item.Subjects?.ToList().Count() ?? 0)
+                @Html.DisplayFor(modelItem => item.NumberOfSubjects)
             </td>
             <td>
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                <input type="button" value="Delete" class="btn btn-danger" onclick="location.href='@Url.Action("Delete", "Student", new { id = item.Id })'" />
             </td>
         </tr>
     }

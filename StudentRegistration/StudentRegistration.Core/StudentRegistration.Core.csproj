@@ -66,7 +66,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\IUnitOfWork.cs" />
     <Compile Include="Data\StudentRegistrationContext.cs" />
+    <Compile Include="Data\UnitOfWork.cs" />
     <Compile Include="Entities\BaseEntity.cs" />
     <Compile Include="Entities\Student.cs" />
     <Compile Include="Entities\StudentSubject.cs" />
@@ -86,6 +88,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Repositories\GenericRepository.cs" />
+    <Compile Include="Repositories\Abstractions\IGenericRepository.cs" />
+    <Compile Include="Services\Abstractions\IStudentService.cs" />
+    <Compile Include="Services\Abstractions\ISubjectService.cs" />
+    <Compile Include="Services\StudentService.cs" />
+    <Compile Include="Services\SubjectService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -95,10 +103,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
       <Visible>False</Visible>

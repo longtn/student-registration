@@ -1,4 +1,5 @@
-﻿@model StudentRegistration.Core.Entities.Student
+﻿@using StudentRegistration.App.Enums
+@model StudentRegistration.App.DTOs.StudentDTO
 
 @{
     ViewBag.Title = "Edit";
@@ -16,6 +17,7 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreatedDate)
 
         <div class="form-group">
             @Html.LabelFor(model => model.NRIC, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -36,15 +38,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Gender, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.Gender,
-                       new List<SelectListItem>
-                       {
-                           new SelectListItem{ Text = "Male", Value = "M" },
-                           new SelectListItem{ Text = "Female", Value = "F" }
-                       },
-                       "Select Gender",
-                       new { @class = "form-control" }
-                   )
+                @Html.EnumDropDownListFor( x => x.Gender, "Select Gender", new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -64,6 +58,15 @@
                 @Html.ValidationMessageFor(model => model.AvailableDate, "", new { @class = "text-danger" })
             </div>
         </div>
+
+        @*<div class="form-group">
+                @Html.LabelFor(model => model.Subjects, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.ListBoxFor(model => model.Subjects,
+                           new MultiSelectList(ViewBag.ItemsBag, "Value", "Text", Model.Subjects.Select(x => x.Id)),
+                           new { @class = "form-control features-segments select2-multiselect-checkbox", multiple = "multiple" })
+                </div>
+            </div>*@
 
         <p></p>
         <div class="form-group">
