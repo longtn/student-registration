@@ -10,12 +10,24 @@
 
 <table class="table">
     <tr>
-        <th>S/N</th>
-        <th>NRIC</th>
-        <th>Name</th>
-        <th>Gender</th>
-        <th>Age</th>
-        <th>NO. Of Subjects</th>
+        <th>
+            @Html.ActionLink("S/N", "Index", new { SortOrder = ViewBag.SortById })
+        </th>
+        <th>
+            @Html.ActionLink("NRIC", "Index", new { SortOrder = ViewBag.SortByNRIC })
+        </th>
+        <th>
+            @Html.ActionLink("Name", "Index", new { SortOrder = ViewBag.SortByName })
+        </th>
+        <th>
+            @Html.ActionLink("Gender", "Index", new { SortOrder = ViewBag.SortByGender })
+        </th>
+        <th>
+            @Html.ActionLink("Age", "Index", new { SortOrder = ViewBag.SortByAge })
+        </th>
+        <th>
+            @Html.ActionLink("Age", "Index", new { SortOrder = ViewBag.SortBySubjects })
+        </th>
         <th></th>
     </tr>
 

@@ -23,12 +23,11 @@ namespace StudentRegistration.App.DTOs
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         [DataType(DataType.DateTime)]
         [Required]
-        public DateTime Birthday { get; set; }
+        public DateTime Birthday { get; set; } = DateTime.Now;
 
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         [DataType(DataType.DateTime)]
-        [Required]
-        public DateTime? AvailableDate { get; set; }
+        public DateTime? AvailableDate { get; set; } = null;
 
         public DateTime CreatedDate { get; set; }
 

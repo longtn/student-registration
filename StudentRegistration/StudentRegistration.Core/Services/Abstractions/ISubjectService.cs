@@ -5,7 +5,7 @@ namespace StudentRegistration.Core.Services.Abstractions
 {
     public interface ISubjectService
     {
-        List<Subject> GetSubjects();
-        List<Subject> GetSubjectsByStudent(int id);
+        IEnumerable<Subject> GetSubjects();
+        IEnumerable<Subject> GetSubjectsByStudent(int id);
     }
 }

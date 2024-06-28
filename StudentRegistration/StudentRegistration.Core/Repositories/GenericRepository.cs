@@ -75,7 +75,6 @@ namespace StudentRegistration.Core.Repositories
             try
             {
                 this.Entities.Add(entity);
-
                 return entity;
             }
             catch (Exception ex)
@@ -90,7 +89,7 @@ namespace StudentRegistration.Core.Repositories
             {
                 foreach (var entity in entities)
                 {
-                    Entities.AddOrUpdate(entity);
+                    this.Entities.AddOrUpdate(entity);
                 }
 
                 return true;
@@ -106,7 +105,7 @@ namespace StudentRegistration.Core.Repositories
             if (entity == null) throw new ArgumentNullException($"{nameof(entity)} entity must not be null");
             try
             {
-                this.Entities.Add(entity);
+                this.Entities.AddOrUpdate(entity);
                 return true;
             }
             catch (Exception ex)

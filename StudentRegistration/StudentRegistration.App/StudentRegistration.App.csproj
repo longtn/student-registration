@@ -142,6 +142,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Enums\SortEnum.cs" />
     <Compile Include="Profiles\AutoMapperConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -151,7 +152,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Extensions\StudentExtensions.cs" />
-    <Compile Include="DTOs\SubjectDTO.cs" />
     <Compile Include="DTOs\StudentDTO.cs" />
     <Compile Include="Profiles\StudentProfile.cs" />
     <Compile Include="Profiles\SubjectProfile.cs" />

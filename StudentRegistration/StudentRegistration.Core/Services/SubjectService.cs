@@ -20,16 +20,16 @@ namespace StudentRegistration.Core.Services
             _studentSubjectRepo = studentSubjectRepo;
         }
 
-        public List<Subject> GetSubjects()
+        public IEnumerable<Subject> GetSubjects()
         {
-            return _subjectRepo.GetAll().ToList();
+            return _subjectRepo.GetAll();
         }
 
-        public List<Subject> GetSubjectsByStudent(int id)
+        public IEnumerable<Subject> GetSubjectsByStudent(int id)
         {
             var subjectIds = _studentSubjectRepo.Where(x => x.StudentId == id).Select(a => a.SubjectId).ToList();
             var subjects = _subjectRepo.Where(a => subjectIds.Contains(a.Id));
-            return subjects.ToList();
+            return subjects;
         }
     }
 }

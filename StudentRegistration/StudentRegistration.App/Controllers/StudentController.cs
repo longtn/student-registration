@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using StudentRegistration.App.DTOs;
+using StudentRegistration.Core.Constants;
 using StudentRegistration.Core.Entities;
+using StudentRegistration.Core.Models;
 using StudentRegistration.Core.Services.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -27,17 +29,26 @@ namespace StudentRegistration.App.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult Index()
+        public ActionResult Index(SearchModel search)
         {
-            var students = _studentService.GetStudents();
-            var result = _mapper.Map<List<StudentDTO>>(students);
+            UpdateSorts(search.SortOrder);
 
+            var students = _studentService.GetStudents(search);
+            var result = _mapper.Map<List<StudentDTO>>(students);
             return View(result);
         }
 
         public ActionResult Create()
         {
-            return View();
+            var student = new StudentDTO();
+            var subjects = _subjectService.GetSubjects();
+            ViewBag.Subjects = subjects.Select(i => new SelectListItem
+            {
+                Text = i.Name,
+                Value = i.Id.ToString()
+            });
+
+            return View(student);
         }
 
         [HttpPost]
@@ -46,27 +57,37 @@ namespace StudentRegistration.App.Controllers
         {
             if (ModelState.IsValid)
             {
-                //student.CreatedDate = DateTime.Now;
-                //student.UpdatedDate = DateTime.Now;
-                //db.Students.Add(student);
-                //await db.SaveChangesAsync();
+                var data = _mapper.Map<Student>(student);
+                var subjects = new List<StudentSubject>();
+                foreach (var selected in student.SelectedSubjects)
+                {
+                    subjects.Add(new StudentSubject() { SubjectId = selected });
+                }
+
+                data.Subjects = subjects;
+                _studentService.CreateStudent(data);
+
                 return RedirectToAction("Index");
             }
 
             return View(student);
         }
 
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
-            var student = _studentService.GetStudent(id);
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var student = _studentService.GetStudent((int)id);
             if (student == null)
             {
                 return HttpNotFound();
             }
 
-            var subjects = _subjectService.GetSubjects();
             var result = _mapper.Map<StudentDTO>(student);
-
+            var subjects = _subjectService.GetSubjects();
             ViewBag.Subjects = subjects.Select(i => new SelectListItem
             {
                 Text = i.Name,
@@ -83,12 +104,18 @@ namespace StudentRegistration.App.Controllers
             if (ModelState.IsValid)
             {
                 var data = _mapper.Map<Student>(student);
-                var subjects = _subjectService.GetSubjects();
-                
-                data.UpdatedDate = DateTime.Now;
-                data.Subjects = (IEnumerable<StudentSubject>)subjects.Where(i => student.SelectedSubjects.Contains(i.Id)).ToList();
+                var subjects = new List<StudentSubject>();
+                foreach (var selected in student.SelectedSubjects)
+                {
+                    subjects.Add(new StudentSubject()
+                    {
+                        StudentId = data.Id,
+                        SubjectId = selected,
+                    });
+                }
 
-                //_studentService.UpdateStudent(data);
+                data.Subjects = subjects;
+                _studentService.UpdateStudent(data);
                 return RedirectToAction("Index");
             }
             return View(student);
@@ -101,22 +128,51 @@ namespace StudentRegistration.App.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            //Student student = await db.Students.FindAsync(id);
-            //if (student == null)
-            //{
-            //    return HttpNotFound();
-            //}
-            return View();
+            var student = _studentService.GetStudent((int)id);
+            if (student == null)
+            {
+                return HttpNotFound();
+            }
+
+            var result = _mapper.Map<StudentDTO>(student);
+            return View(result);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            //Student student = await db.Students.FindAsync(id);
-            //db.Students.Remove(student);
-            //await db.SaveChangesAsync();
+            var student = _studentService.GetStudent((int)id);
+            if (student == null)
+            {
+                return HttpNotFound();
+            }
+
+            _studentService.DeleteStudent(student);
             return RedirectToAction("Index");
+        }
+
+
+        private void UpdateSorts(string sortOrder)
+        {
+            ViewBag.SortById = sortOrder == CommonConstants.Id
+                ? CommonConstants.Id_DESC
+                : CommonConstants.Id;
+            ViewBag.SortByNRIC = sortOrder == CommonConstants.NRIC
+                ? CommonConstants.NRIC_DESC
+                : CommonConstants.NRIC;
+            ViewBag.SortByName = sortOrder == CommonConstants.Name
+                ? CommonConstants.Name_DESC
+                : CommonConstants.Name;
+            ViewBag.SortByGender = sortOrder == CommonConstants.Gender
+                ? CommonConstants.Gender_DESC
+                : CommonConstants.Gender;
+            ViewBag.SortByAge = sortOrder == CommonConstants.Age
+                ? CommonConstants.Age_DESC
+                : CommonConstants.Age;
+            ViewBag.SortBySubjects = sortOrder == CommonConstants.Subjects
+                ? CommonConstants.Subjects_DESC
+                : CommonConstants.Subjects;
         }
     }
 }

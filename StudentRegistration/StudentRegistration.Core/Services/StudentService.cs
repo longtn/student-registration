@@ -1,5 +1,6 @@
 ﻿using StudentRegistration.Core.Data;
 using StudentRegistration.Core.Entities;
+using StudentRegistration.Core.Models;
 using StudentRegistration.Core.Repositories.Abstractions;
 using StudentRegistration.Core.Services.Abstractions;
 using System;
@@ -25,45 +26,71 @@ namespace StudentRegistration.Core.Services
             _uow = uow;
         }
 
-        public List<Student> GetStudents()
-        {
-            var student = _studentRepo.GetAll().ToList();
-            return student;
-        }
-
         public Student GetStudent(int id)
         {
             var student = _studentRepo.GetById(id);
             return student;
         }
 
-        public Student CreateStudent(Student model)
+        public List<Student> GetStudents()
         {
-            throw new System.NotImplementedException();
+            var student = _studentRepo.GetAll().ToList();
+            return student;
         }
 
-        public bool UpdateStudent(Student model)
+        public List<Student> GetStudents(SearchModel searchModel)
         {
-            var subjects = _studentSubjectRepo.Where(a => a.StudentId == model.Id).ToList();
-            _studentSubjectRepo.Delete(subjects);
+            var student = _studentRepo.GetAll().ToList();
+            return student;
+        }
+
+        public Student CreateStudent(Student model)
+        {
+            model.CreatedDate = DateTime.UtcNow;
+            model.UpdatedDate = DateTime.UtcNow;
+            var createdStudent = _studentRepo.Create(model);
+
+            var studentSubjects = model.Subjects.ToList();
+            foreach (var item in studentSubjects)
+            {
+                item.StudentId = createdStudent.Id;
+                item.CreatedDate = DateTime.Now;
+                item.UpdatedDate = DateTime.Now;
+            }
+
+            _studentSubjectRepo.Create(studentSubjects);
+            _uow.SaveChanges();
+
+            return createdStudent;
+        }
+
+        public Student UpdateStudent(Student model)
+        {
+            var oldStudentSubjects = _studentSubjectRepo.Where(a => a.StudentId == model.Id).ToList();
+            _studentSubjectRepo.Delete(oldStudentSubjects);
 
             model.UpdatedDate = DateTime.UtcNow;
             var isUpdated = _studentRepo.Update(model);
 
-            _studentSubjectRepo.Create(model.Subjects.ToList());
+            var newStudentSubjects = model.Subjects.ToList();
+            foreach (var item in newStudentSubjects)
+            {
+                item.CreatedDate = DateTime.Now;
+                item.UpdatedDate = DateTime.Now;
+            }
+
+            _studentSubjectRepo.Create(newStudentSubjects);
+            _uow.SaveChanges();
+
+            return model;
+        }
+
+        public bool DeleteStudent(Student model)
+        {
+            _studentRepo.Delete(model);
             _uow.SaveChanges();
 
             return true;
-        }
-
-        Student IStudentService.UpdateStudent(Student model)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool DeleteStudent(int id)
-        {
-            throw new NotImplementedException();
         }
     }
 }
