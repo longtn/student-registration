@@ -1,4 +1,5 @@
-﻿using StudentRegistration.Core.Data;
+﻿using Serilog;
+using StudentRegistration.Core.Data;
 using StudentRegistration.Core.Entities;
 using StudentRegistration.Core.Repositories.Abstractions;
 using System;
@@ -29,7 +30,8 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"Couldn't find entity: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - GetAll - Couldn't find entity: {ex.Message}");
+                return Enumerable.Empty<T>();
             }
         }
 
@@ -41,7 +43,8 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"Couldn't find entity: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - GetById - Couldn't find entity: {ex.Message}");
+                return null;
             }
         }
 
@@ -53,7 +56,8 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"Couldn't retrieve entities: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - Where - Couldn't retrieve entities: {ex.Message}");
+                return null;
             }
         }
 
@@ -65,13 +69,18 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
+                Log.Logger.Error($"GenericRepository - ToQueryable - Couldn't retrieve entities: {ex.Message}");
                 throw new Exception($"Couldn't retrieve entities: {ex.Message}");
             }
         }
 
         public T Create(T entity)
         {
-            if (entity == null) throw new ArgumentNullException($"{nameof(entity)} entity must not be null");
+            if (entity == null)
+            {
+                Log.Logger.Error($"GenericRepository - Create - {nameof(entity)} entity must not be null");
+                return null;
+            }
             try
             {
                 this.Entities.Add(entity);
@@ -79,7 +88,8 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"{nameof(entity)} could not be insert: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - Create - {nameof(entity)} could not be insert: {ex.Message}");
+                return null;
             }
         }
 
@@ -96,13 +106,18 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"List of {nameof(T)} could not be insert: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - Create - List of {nameof(T)} could not be insert: {ex.Message}");
+                return false;
             }
         }
 
         public bool Update(T entity)
         {
-            if (entity == null) throw new ArgumentNullException($"{nameof(entity)} entity must not be null");
+            if (entity == null)
+            {
+                Log.Logger.Error($"GenericRepository - Update - {nameof(entity)} entity must not be null");
+                return false;
+            }
             try
             {
                 this.Entities.AddOrUpdate(entity);
@@ -110,7 +125,8 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"{nameof(entity)} could not be insert: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - Update - {nameof(entity)} could not be insert: {ex.Message}");
+                return false;
             }
         }
 
@@ -123,7 +139,8 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"Couldn't delete entity: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - Delete - Couldn't delete entity: {ex.Message}");
+                return false;
             }
         }
 
@@ -140,7 +157,8 @@ namespace StudentRegistration.Core.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception($"Couldn't delete entity: {ex.Message}");
+                Log.Logger.Error($"GenericRepository - Delete - Couldn't delete entity: {ex.Message}");
+                return false;
             }
         }
     }

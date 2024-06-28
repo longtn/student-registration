@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PagedList;
+using Serilog;
 using StudentRegistration.App.DTOs;
 using StudentRegistration.Core.Entities;
 using StudentRegistration.Core.Services.Abstractions;
@@ -40,8 +41,9 @@ namespace StudentRegistration.App.Controllers
 
             var students = _studentService.GetStudents(search);
             var result = _mapper.Map<List<StudentDTO>>(students);
-
             ViewBag.CurrentSearch = search;
+
+            Log.Logger.Information($"StudentController - Index - Search: {search} Page: {page}");
             return View(result.ToPagedList(page ?? 1, 10));
         }
 
@@ -55,6 +57,7 @@ namespace StudentRegistration.App.Controllers
                 Value = i.Id.ToString()
             });
 
+            Log.Logger.Information("StudentController - Create");
             return View(student);
         }
 
@@ -74,9 +77,12 @@ namespace StudentRegistration.App.Controllers
                 data.Subjects = subjects;
                 _studentService.CreateStudent(data);
 
+                Log.Logger.Information("StudentController - Create - Student:");
+                Log.Logger.Information($"{student.ToLog()}");
                 return RedirectToAction("Index");
             }
 
+            Log.Logger.Warning("StudentController - Create - Student is not valid");
             return View(student);
         }
 
@@ -101,6 +107,7 @@ namespace StudentRegistration.App.Controllers
                 Value = i.Id.ToString()
             });
 
+            Log.Logger.Information($"StudentController - Edit - StudentId: {id}");
             return View(result);
         }
 
@@ -123,8 +130,12 @@ namespace StudentRegistration.App.Controllers
 
                 data.Subjects = subjects;
                 _studentService.UpdateStudent(data);
+                Log.Logger.Information("StudentController - Edit - Student:");
+                Log.Logger.Information($"{student.ToLog()}");
                 return RedirectToAction("Index");
             }
+
+            Log.Logger.Warning("StudentController - Edit - Student is not valid");
             return View(student);
         }
 
@@ -142,6 +153,8 @@ namespace StudentRegistration.App.Controllers
             }
 
             var result = _mapper.Map<StudentDTO>(student);
+
+            Log.Logger.Information($"StudentController - Delete - StudentId: {id}");
             return View(result);
         }
 
@@ -156,6 +169,8 @@ namespace StudentRegistration.App.Controllers
             }
 
             _studentService.DeleteStudent(student);
+
+            Log.Logger.Information($"StudentController - DeleteConfirmed - StudentId: {id}");
             return RedirectToAction("Index");
         }
     }

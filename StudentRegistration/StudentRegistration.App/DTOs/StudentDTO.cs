@@ -49,5 +49,11 @@ namespace StudentRegistration.App.DTOs
                 return SelectedSubjects.Count;
             }
         }
+
+        public string ToLog()
+        {
+            return $"Id = {Id}, NRIC = {NRIC}, Name = {Name}, Gender = {Gender}, " +
+                   $"DOB = {Birthday}, AvailableDate = {AvailableDate}, SelectedSubjects = ${SelectedSubjects.Count}";
+        }
     }
 }
