@@ -1,6 +1,5 @@
 ﻿using StudentRegistration.Core.Data;
 using StudentRegistration.Core.Entities;
-using StudentRegistration.Core.Models;
 using StudentRegistration.Core.Repositories.Abstractions;
 using StudentRegistration.Core.Services.Abstractions;
 using System;
@@ -34,23 +33,33 @@ namespace StudentRegistration.Core.Services
 
         public List<Student> GetStudents()
         {
-            var student = _studentRepo.GetAll().ToList();
-            return student;
+            var students = _studentRepo.GetAll().ToList();
+            return students;
         }
 
-        public List<Student> GetStudents(SearchModel searchModel)
+        public List<Student> GetStudents(string searchStr)
         {
-            var student = _studentRepo.GetAll().ToList();
-            return student;
+            var students = _studentRepo.ToQueryable();
+
+            students = !string.IsNullOrWhiteSpace(searchStr)
+                ? students.Where(a => a.Name.Contains(searchStr) || a.NRIC.Contains(searchStr))
+                : students;
+
+            var result = students
+                .OrderBy(a => a.Id)
+                .ToList();
+
+            result.ForEach(a => a.Subjects = _studentSubjectRepo.Where(b => b.StudentId == a.Id).ToList());
+            return result;
         }
 
-        public Student CreateStudent(Student model)
+        public Student CreateStudent(Student student)
         {
-            model.CreatedDate = DateTime.UtcNow;
-            model.UpdatedDate = DateTime.UtcNow;
-            var createdStudent = _studentRepo.Create(model);
+            student.CreatedDate = DateTime.UtcNow;
+            student.UpdatedDate = DateTime.UtcNow;
+            var createdStudent = _studentRepo.Create(student);
 
-            var studentSubjects = model.Subjects.ToList();
+            var studentSubjects = student.Subjects.ToList();
             foreach (var item in studentSubjects)
             {
                 item.StudentId = createdStudent.Id;
@@ -64,15 +73,15 @@ namespace StudentRegistration.Core.Services
             return createdStudent;
         }
 
-        public Student UpdateStudent(Student model)
+        public Student UpdateStudent(Student student)
         {
-            var oldStudentSubjects = _studentSubjectRepo.Where(a => a.StudentId == model.Id).ToList();
+            var oldStudentSubjects = _studentSubjectRepo.Where(a => a.StudentId == student.Id).ToList();
             _studentSubjectRepo.Delete(oldStudentSubjects);
 
-            model.UpdatedDate = DateTime.UtcNow;
-            var isUpdated = _studentRepo.Update(model);
+            student.UpdatedDate = DateTime.UtcNow;
+            var isUpdated = _studentRepo.Update(student);
 
-            var newStudentSubjects = model.Subjects.ToList();
+            var newStudentSubjects = student.Subjects.ToList();
             foreach (var item in newStudentSubjects)
             {
                 item.CreatedDate = DateTime.Now;
@@ -82,12 +91,12 @@ namespace StudentRegistration.Core.Services
             _studentSubjectRepo.Create(newStudentSubjects);
             _uow.SaveChanges();
 
-            return model;
+            return student;
         }
 
-        public bool DeleteStudent(Student model)
+        public bool DeleteStudent(Student student)
         {
-            _studentRepo.Delete(model);
+            _studentRepo.Delete(student);
             _uow.SaveChanges();
 
             return true;

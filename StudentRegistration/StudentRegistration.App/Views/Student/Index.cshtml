@@ -1,33 +1,30 @@
-﻿@model IEnumerable<StudentRegistration.App.DTOs.StudentDTO>
+﻿@model PagedList.IPagedList<StudentRegistration.App.DTOs.StudentDTO>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Students";
 }
 
 <h2>Students</h2>
 
-<input type="button" value="Create New" class="btn btn-primary" onclick="location.href='@Url.Action("Create", "Student")'" />
+@using (Html.BeginForm())
+{
+    @Html.Label("Search NRIC or Name ", htmlAttributes: new { @class = "control-label col-md-2" })
+    <div class="d-flex">
+        @Html.TextBox("Search", ViewBag.CurrentSearch as string, new { @class = "form-control" })
+        <input type="submit" value="Search" class="btn btn-outline-primary ms-5" />
+    </div>
+}
 
 <table class="table">
     <tr>
-        <th>
-            @Html.ActionLink("S/N", "Index", new { SortOrder = ViewBag.SortById })
-        </th>
-        <th>
-            @Html.ActionLink("NRIC", "Index", new { SortOrder = ViewBag.SortByNRIC })
-        </th>
-        <th>
-            @Html.ActionLink("Name", "Index", new { SortOrder = ViewBag.SortByName })
-        </th>
-        <th>
-            @Html.ActionLink("Gender", "Index", new { SortOrder = ViewBag.SortByGender })
-        </th>
-        <th>
-            @Html.ActionLink("Age", "Index", new { SortOrder = ViewBag.SortByAge })
-        </th>
-        <th>
-            @Html.ActionLink("Age", "Index", new { SortOrder = ViewBag.SortBySubjects })
-        </th>
+        <th>S/N</th>
+        <th>NRIC</th>
+        <th>Name</th>
+        <th>Gender</th>
+        <th>Age</th>
+        <th>NO. Of Subjects</th>
         <th></th>
     </tr>
 
@@ -58,3 +55,10 @@
         </tr>
     }
 </table>
+
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page, currentSearch = ViewBag.CurrentSearch }))
+
+<br />
+<input type="button" value="Add New" class="btn btn-primary" onclick="location.href='@Url.Action("Create", "Student")'" />

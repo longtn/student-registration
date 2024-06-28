@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
+using PagedList;
 using StudentRegistration.App.DTOs;
-using StudentRegistration.Core.Constants;
 using StudentRegistration.Core.Entities;
-using StudentRegistration.Core.Models;
 using StudentRegistration.Core.Services.Abstractions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -29,13 +27,22 @@ namespace StudentRegistration.App.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult Index(SearchModel search)
+        public ActionResult Index(string search, string currentSearch, int? page)
         {
-            UpdateSorts(search.SortOrder);
+            if (search != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                search = currentSearch;
+            }
 
             var students = _studentService.GetStudents(search);
             var result = _mapper.Map<List<StudentDTO>>(students);
-            return View(result);
+
+            ViewBag.CurrentSearch = search;
+            return View(result.ToPagedList(page ?? 1, 10));
         }
 
         public ActionResult Create()
@@ -150,29 +157,6 @@ namespace StudentRegistration.App.Controllers
 
             _studentService.DeleteStudent(student);
             return RedirectToAction("Index");
-        }
-
-
-        private void UpdateSorts(string sortOrder)
-        {
-            ViewBag.SortById = sortOrder == CommonConstants.Id
-                ? CommonConstants.Id_DESC
-                : CommonConstants.Id;
-            ViewBag.SortByNRIC = sortOrder == CommonConstants.NRIC
-                ? CommonConstants.NRIC_DESC
-                : CommonConstants.NRIC;
-            ViewBag.SortByName = sortOrder == CommonConstants.Name
-                ? CommonConstants.Name_DESC
-                : CommonConstants.Name;
-            ViewBag.SortByGender = sortOrder == CommonConstants.Gender
-                ? CommonConstants.Gender_DESC
-                : CommonConstants.Gender;
-            ViewBag.SortByAge = sortOrder == CommonConstants.Age
-                ? CommonConstants.Age_DESC
-                : CommonConstants.Age;
-            ViewBag.SortBySubjects = sortOrder == CommonConstants.Subjects
-                ? CommonConstants.Subjects_DESC
-                : CommonConstants.Subjects;
         }
     }
 }
