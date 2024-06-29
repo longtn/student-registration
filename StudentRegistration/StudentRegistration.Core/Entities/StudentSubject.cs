@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudentRegistration.Core.Entities
@@ -15,6 +14,7 @@ namespace StudentRegistration.Core.Entities
         public int SubjectId { get; set; }
 
         public virtual Student Student { get; set; }
+
         public virtual Subject Subject { get; set; }
     }
 }

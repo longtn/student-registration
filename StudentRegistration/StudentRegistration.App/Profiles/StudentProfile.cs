@@ -11,12 +11,16 @@ namespace StudentRegistration.App.Profiles
         public StudentProfile()
         {
             CreateMap<Student, StudentDTO>()
-                    .ForMember(dest => dest.SelectedSubjects, opt => opt.MapFrom(src => src.Subjects.Select(i => i.Id)))
-                    .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender == "M" ? GenderEnum.Male : GenderEnum.Female));
+                    .ForMember(dest => dest.SelectedSubjects,
+                                opt => opt.MapFrom(src => src.Subjects.Select(i => i.SubjectId)))
+                    .ForMember(dest => dest.Gender, 
+                                opt => opt.MapFrom(src => src.Gender == "M" ? GenderEnum.Male : GenderEnum.Female));
 
             CreateMap<StudentDTO, Student>()
-                    .ForMember(dest => dest.Subjects, opt => opt.Ignore())
-                    .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender == GenderEnum.Male ? "M" : "F"));
+                    .ForMember(dest => dest.Subjects, 
+                                opt => opt.Ignore())
+                    .ForMember(dest => dest.Gender, 
+                                opt => opt.MapFrom(src => src.Gender == GenderEnum.Male ? "M" : "F"));
         }
     }
 }

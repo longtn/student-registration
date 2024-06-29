@@ -27,37 +27,47 @@ namespace StudentRegistration.Core.Services
 
         public Student GetStudent(int id)
         {
+            if (!IsStudentExists(id)) 
+                return null;
+
             var student = _studentRepo.GetById(id);
+            student.Subjects = _studentSubjectRepo.Where(ss => ss.StudentId == student.Id).ToList();
             return student;
         }
 
-        public List<Student> GetStudents()
+        public IEnumerable<Student> GetStudents()
         {
-            var students = _studentRepo.GetAll().ToList();
+            var students = _studentRepo.GetAll();
             return students;
         }
 
-        public List<Student> GetStudents(string searchStr)
+        public IEnumerable<Student> GetStudents(string searchString)
         {
             var students = _studentRepo.ToQueryable();
 
-            students = !string.IsNullOrWhiteSpace(searchStr)
-                ? students.Where(a => a.Name.Contains(searchStr) || a.NRIC.Contains(searchStr))
+            students = !string.IsNullOrWhiteSpace(searchString)
+                ? students.Where(s => s.Name.Contains(searchString) || s.NRIC.Contains(searchString))
                 : students;
 
             var result = students
-                .OrderBy(a => a.Id)
+                .OrderBy(s => s.Id)
                 .ToList();
 
-            result.ForEach(a => a.Subjects = _studentSubjectRepo.Where(b => b.StudentId == a.Id).ToList());
+            result.ForEach(s => s.Subjects = _studentSubjectRepo.Where(ss => ss.StudentId == s.Id).ToList());
             return result;
         }
 
         public Student CreateStudent(Student student)
         {
-            student.CreatedDate = DateTime.UtcNow;
-            student.UpdatedDate = DateTime.UtcNow;
+            if (!IsStudentExists(student.Id)) 
+                return null;
+
+            student.CreatedDate = DateTime.Now;
+            student.UpdatedDate = DateTime.Now;
+
             var createdStudent = _studentRepo.Create(student);
+            if (createdStudent is null) 
+                return null;
 
             var studentSubjects = student.Subjects.ToList();
             foreach (var item in studentSubjects)
@@ -75,11 +85,16 @@ namespace StudentRegistration.Core.Services
 
         public Student UpdateStudent(Student student)
         {
-            var oldStudentSubjects = _studentSubjectRepo.Where(a => a.StudentId == student.Id).ToList();
-            _studentSubjectRepo.Delete(oldStudentSubjects);
+            if (!IsStudentExists(student.Id)) 
+                return null;
 
-            student.UpdatedDate = DateTime.UtcNow;
-            var isUpdated = _studentRepo.Update(student);
+            var oldStudentSubjects = _studentSubjectRepo.Where(ss => ss.StudentId == student.Id).ToList();
+            _studentSubjectRepo.Delete(oldStudentSubjects);
+            student.UpdatedDate = DateTime.Now;
+
+            var updatedStudent = _studentRepo.Update(student);
+            if (!updatedStudent) 
+                return null;
 
             var newStudentSubjects = student.Subjects.ToList();
             foreach (var item in newStudentSubjects)
@@ -96,10 +111,16 @@ namespace StudentRegistration.Core.Services
 
         public bool DeleteStudent(Student student)
         {
-            _studentRepo.Delete(student);
-            _uow.SaveChanges();
+            if (!_studentRepo.Delete(student)) 
+                return false;
 
+            _uow.SaveChanges();
             return true;
+        }
+
+        private bool IsStudentExists(int id)
+        {
+            return _studentRepo.GetById(id) != null;
         }
     }
 }

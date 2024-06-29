@@ -62,9 +62,9 @@
         <div class="form-group">
             @Html.Label("Select Subjects", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.ListBoxFor(model => model.SelectedSubjects,
-                       new SelectList(ViewBag.Subjects, "Value", "Text", Model.SelectedSubjects),
-                       new { @class = "form-control selectpicker", multiple = "multiple" })
+                @Html.ListBoxFor(model => model.SelectedSubjects, 
+                       new SelectList(ViewBag.Subjects, "Value", "Text", Model.SelectedSubjects), 
+                       new { @class = "form-control"})
             </div>
         </div>
 

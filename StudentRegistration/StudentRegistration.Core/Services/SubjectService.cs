@@ -27,8 +27,8 @@ namespace StudentRegistration.Core.Services
 
         public IEnumerable<Subject> GetSubjectsByStudent(int id)
         {
-            var subjectIds = _studentSubjectRepo.Where(x => x.StudentId == id).Select(a => a.SubjectId).ToList();
-            var subjects = _subjectRepo.Where(a => subjectIds.Contains(a.Id));
+            var subjectIds = _studentSubjectRepo.Where(ss => ss.StudentId == id).Select(ss => ss.SubjectId).ToList();
+            var subjects = _subjectRepo.Where(s => subjectIds.Contains(s.Id));
             return subjects;
         }
     }

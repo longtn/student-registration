@@ -6,8 +6,8 @@ namespace StudentRegistration.Core.Services.Abstractions
     public interface IStudentService
     {
         Student GetStudent(int id);
-        List<Student> GetStudents();
-        List<Student> GetStudents(string searchStr);
+        IEnumerable<Student> GetStudents();
+        IEnumerable<Student> GetStudents(string searchStr);
         Student CreateStudent(Student model);
         Student UpdateStudent(Student model);
         bool DeleteStudent(Student model);

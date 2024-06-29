@@ -76,7 +76,7 @@ namespace StudentRegistration.Core.Repositories
 
         public T Create(T entity)
         {
-            if (entity == null)
+            if (entity is null)
             {
                 Log.Logger.Error($"GenericRepository - Create - {nameof(entity)} entity must not be null");
                 return null;
@@ -113,7 +113,7 @@ namespace StudentRegistration.Core.Repositories
 
         public bool Update(T entity)
         {
-            if (entity == null)
+            if (entity is null)
             {
                 Log.Logger.Error($"GenericRepository - Update - {nameof(entity)} entity must not be null");
                 return false;

@@ -51,10 +51,10 @@ namespace StudentRegistration.App.Controllers
         {
             var student = new StudentDTO();
             var subjects = _subjectService.GetSubjects();
-            ViewBag.Subjects = subjects.Select(i => new SelectListItem
+            ViewBag.Subjects = subjects.Select(s => new SelectListItem
             {
-                Text = i.Name,
-                Value = i.Id.ToString()
+                Text = s.Name,
+                Value = s.Id.ToString()
             });
 
             Log.Logger.Information("StudentController - Create");
@@ -75,36 +75,34 @@ namespace StudentRegistration.App.Controllers
                 }
 
                 data.Subjects = subjects;
-                _studentService.CreateStudent(data);
-
-                Log.Logger.Information("StudentController - Create - Student:");
-                Log.Logger.Information($"{student.ToLog()}");
-                return RedirectToAction("Index");
+                if (_studentService.CreateStudent(data) != null)
+                {
+                    Log.Logger.Information("StudentController - Create - Student:");
+                    Log.Logger.Information($"{student.ToLog()}");
+                    return RedirectToAction("Index");
+                }
             }
 
             Log.Logger.Warning("StudentController - Create - Student is not valid");
+            Log.Logger.Warning($"{student.ToLog()}");
             return View(student);
         }
 
         public ActionResult Edit(int? id)
         {
-            if (id == null)
-            {
+            if (id is null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
             var student = _studentService.GetStudent((int)id);
-            if (student == null)
-            {
+            if (student is null)
                 return HttpNotFound();
-            }
 
             var result = _mapper.Map<StudentDTO>(student);
             var subjects = _subjectService.GetSubjects();
-            ViewBag.Subjects = subjects.Select(i => new SelectListItem
+            ViewBag.Subjects = subjects.Select(s => new SelectListItem
             {
-                Text = i.Name,
-                Value = i.Id.ToString()
+                Text = s.Name,
+                Value = s.Id.ToString()
             });
 
             Log.Logger.Information($"StudentController - Edit - StudentId: {id}");
@@ -129,28 +127,27 @@ namespace StudentRegistration.App.Controllers
                 }
 
                 data.Subjects = subjects;
-                _studentService.UpdateStudent(data);
-                Log.Logger.Information("StudentController - Edit - Student:");
-                Log.Logger.Information($"{student.ToLog()}");
-                return RedirectToAction("Index");
+                if (_studentService.UpdateStudent(data) != null)
+                {
+                    Log.Logger.Information("StudentController - Edit - Student:");
+                    Log.Logger.Information($"{student.ToLog()}");
+                    return RedirectToAction("Index");
+                }
             }
 
             Log.Logger.Warning("StudentController - Edit - Student is not valid");
+            Log.Logger.Warning($"{student.ToLog()}");
             return View(student);
         }
 
         public ActionResult Delete(int? id)
         {
-            if (id == null)
-            {
+            if (id is null)
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
             var student = _studentService.GetStudent((int)id);
-            if (student == null)
-            {
+            if (student is null)
                 return HttpNotFound();
-            }
 
             var result = _mapper.Map<StudentDTO>(student);
 
@@ -162,15 +159,17 @@ namespace StudentRegistration.App.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            var student = _studentService.GetStudent((int)id);
-            if (student == null)
-            {
+            var student = _studentService.GetStudent(id);
+            if (student is null)
                 return HttpNotFound();
+
+            if (_studentService.DeleteStudent(student))
+            {
+                Log.Logger.Information($"StudentController - DeleteConfirmed - StudentId: {id}");
+                return RedirectToAction("Index");
             }
 
-            _studentService.DeleteStudent(student);
-
-            Log.Logger.Information($"StudentController - DeleteConfirmed - StudentId: {id}");
+            Log.Logger.Warning($"StudentController - DeleteConfirmed - Can not delete StudentId: {id}");
             return RedirectToAction("Index");
         }
     }
