@@ -44,7 +44,7 @@ https://github.com/longtn/student-registration.git
 
 ## Scalability
 For scalability, it's best practice to follow the [Clean Architecture](https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/common-web-application-architectures) approach:
-- Separate repositories and EF into the Infrastructure project.
+- Separate repositories and EF into the Infrastructure layer.
 - Optionally, separate the implementation of the core into an application layer.
 
 ![image](https://github.com/longtn/student-registration/assets/56600830/dd26bd54-b0ca-4c87-a5e4-134ce6299c18)
